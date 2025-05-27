@@ -2,6 +2,8 @@ from typing import Union
 from dataclasses import dataclass
 import json
 from sync import Sync, SyncItem
+from client.gui import App
+import flet as ft
 
 @dataclass
 class SyncItem:
@@ -57,6 +59,5 @@ def select_items(groups: list[SyncGroup]) -> list[SyncItem]:
 
 if __name__ == '__main__':
     groups = load_config('config.json')
-    selected_items = select_items(groups)
-    sync = Sync()
-    sync.sync_items(selected_items)
+    app = App(groups)
+    ft.app(target=app.main)

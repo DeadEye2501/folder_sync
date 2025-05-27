@@ -31,8 +31,8 @@ class Sync:
                 total += self.count_files(entry.path)
         return total
 
-    def sync_items(self, items: list[SyncItem]):
-        logger = SyncLogger()
+    def sync_items(self, items: list[SyncItem], progress_callback=None):
+        logger = SyncLogger(progress_callback)
         
         for item in items:
             if not os.path.exists(item.destination):

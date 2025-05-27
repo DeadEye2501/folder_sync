@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Dict
+from typing import Dict, Optional, Callable
 import time
 
 @dataclass
@@ -11,7 +11,7 @@ class SyncStats:
     errors: int = 0
 
 class SyncLogger:
-    def __init__(self):
+    def __init__(self, progress_callback: Optional[Callable[[str, str], None]] = None):
         self.stats = SyncStats()
         self.current_group = ""
         self.current_item = ""
@@ -19,11 +19,15 @@ class SyncLogger:
         self.processed_files = 0
         self.start_time = 0
         self.dots = ""
+        self.progress_callback = progress_callback
 
     def start_group(self, group_name: str):
         self.current_group = group_name
         self.stats = SyncStats()
-        print(f"\nНачата синхронизация группы: {group_name}")
+        if self.progress_callback:
+            self.progress_callback(f"Начата синхронизация группы: {group_name}", "")
+        else:
+            print(f"\nНачата синхронизация группы: {group_name}")
 
     def start_item(self, item_name: str, total_files: int):
         self.current_item = item_name
@@ -55,7 +59,10 @@ class SyncLogger:
             stats.append(f"errors: {self.stats.errors}")
         
         progress = f"{self.current_item} {percentage}% ({', '.join(stats)})"
-        print(f"\n{progress}", end="", flush=True)
+        if self.progress_callback:
+            self.progress_callback(progress, "")
+        else:
+            print(f"\n{progress}", end="", flush=True)
 
     def file_updated(self):
         self.stats.updated += 1
@@ -78,4 +85,5 @@ class SyncLogger:
         self.update_progress()
 
     def finish_item(self):
-        print() 
+        if not self.progress_callback:
+            print() 
