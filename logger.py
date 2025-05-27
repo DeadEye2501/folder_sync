@@ -55,7 +55,7 @@ class SyncLogger:
             stats.append(f"errors: {self.stats.errors}")
         
         progress = f"{self.current_item} {percentage}% ({', '.join(stats)})"
-        print(f"\r{progress}", end="", flush=True)
+        print(f"\n{progress}", end="", flush=True)
 
     def file_updated(self):
         self.stats.updated += 1

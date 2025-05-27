@@ -62,12 +62,15 @@ class Sync:
                 return
             try:
                 shutil.copy2(source_file, dest_file)
+                os.utime(dest_file, (source_stat.st_atime, source_stat.st_mtime))
                 logger.file_updated()
             except Exception:
                 logger.file_error()
         else:
             try:
                 shutil.copy2(source_file, dest_file)
+                source_stat = os.stat(source_file)
+                os.utime(dest_file, (source_stat.st_atime, source_stat.st_mtime))
                 logger.file_added()
             except Exception:
                 logger.file_error()
