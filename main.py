@@ -2,8 +2,9 @@ from typing import Union
 from dataclasses import dataclass
 import json
 from sync import Sync, SyncItem
-from client.gui import App
+from gui import App
 import flet as ft
+import os
 
 @dataclass
 class SyncItem:
@@ -58,6 +59,9 @@ def select_items(groups: list[SyncGroup]) -> list[SyncItem]:
     return selected_items
 
 if __name__ == '__main__':
+    if not os.path.exists('config.json'):
+        with open('config.json', 'w', encoding='utf-8') as f:
+            f.write('{}')
     groups = load_config('config.json')
     app = App(groups)
-    ft.app(target=app.main)
+    ft.app(target=app.main, assets_dir=".")

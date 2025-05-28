@@ -31,8 +31,8 @@ class Sync:
                 total += self.count_files(entry.path)
         return total
 
-    def sync_items(self, items: list[SyncItem], progress_callback=None):
-        logger = SyncLogger(progress_callback)
+    def sync_items(self, items: list[SyncItem], progress_callback=None, log_callback=None):
+        logger = SyncLogger(progress_callback, log_callback)
         
         for item in items:
             if not os.path.exists(item.destination):
@@ -42,6 +42,7 @@ class Sync:
                 self._sync_file_list(item, logger)
             else:
                 self._sync_directory(item, logger)
+            logger.finish_item()
 
     def _sync_file_list(self, item: SyncItem, logger: SyncLogger):
         logger.start_item(item.name, len(item.source))
@@ -57,7 +58,9 @@ class Sync:
         if os.path.exists(dest_file):
             source_stat = os.stat(source_file)
             dest_stat = os.stat(dest_file)
-            if source_stat.st_size == dest_stat.st_size and source_stat.st_mtime == dest_stat.st_mtime:
+            source_mtime = int(source_stat.st_mtime // 60)
+            dest_mtime = int(dest_stat.st_mtime // 60)
+            if source_stat.st_size == dest_stat.st_size and source_mtime == dest_mtime:
                 logger.file_ignored()
                 return
             try:
